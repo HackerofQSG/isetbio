@@ -55,9 +55,11 @@ obj.initOutputs();
 
 % Set random seed
 if (isempty(obj.randomSeed))
-    rng('shuffle');
+    %rng('shuffle');                         % 2018b and before
+    rng('shuffle', 'CombRecursive');         % 2019a and after
 else
-    rng(obj.randomSeed);
+    %rng(obj.randomSeed);                    % 2018b and before
+    rng(obj.randomSeed, 'CombRecursive');    % 2019a and after
 end
 
 if (obj.beVerbose)
@@ -69,11 +71,13 @@ end
 % Compute first trial
 iTrial = 1;
 computeSingleTrial(obj, emDurationSeconds, sampleDurationSeconds);
-allTrialsEmPosArcMin = zeros(nTrials, ...
-    length(obj.emPosTimeSeriesArcMin), 2);
+nTimeBins = length(obj.timeAxis);
+
+allTrialsEmPosArcMin = zeros(nTrials, nTimeBins, 2);
 allTrialsEmPosArcMin(iTrial, :, :) = ...
     reshape(obj.emPosTimeSeriesArcMin', ...
-    [1 length(obj.emPosTimeSeriesArcMin) 2]);
+    [1 nTimeBins 2]);
+
 
 if (computeVelocity)
     allTrialsVelocityArcMin = zeros(nTrials, ...
